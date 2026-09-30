@@ -1,0 +1,135 @@
+# SEB-XRIF Analytics Configuration
+# Authoritative configuration for reproducibility and ML pipeline execution
+
+project:
+  name: "SEB-XRIF"
+  title: "Scalable, Evidence-Based XR Integration Framework"
+  version: "0.1.0"
+  author: "SEB-XRIF Research Group"
+
+environment:
+  seed: 42
+  log_level: "INFO"
+  device: "cpu"
+
+dataset:
+  raw_path: "data/raw/xAPI-Edu-Data.csv"
+  processed_train_path: "data/processed/train.parquet"
+  processed_test_path: "data/processed/test.parquet"
+  total_records: 480
+  predictors_count: 16
+  target_column: "Class"
+  target_classes:
+    - "L"
+    - "M"
+    - "H"
+  display_classes:
+    L: "Low"
+    M: "Medium"
+    H: "High"
+  expected_distribution:
+    L: 127
+    M: 211
+    H: 142
+
+features:
+  demographic:
+    - "gender"
+    - "NationalITy"
+    - "PlaceofBirth"
+    - "StageID"
+    - "GradeID"
+    - "SectionID"
+  academic:
+    - "Topic"
+    - "Semester"
+    - "Relation"
+    - "ParentAnsweringSurvey"
+    - "ParentschoolSatisfaction"
+    - "StudentAbsenceDays"
+  behavioural:
+    - "raisedhands"
+    - "VisITedResources"
+    - "AnnouncementsView"
+    - "Discussion"
+
+split:
+  train_ratio: 0.80
+  test_ratio: 0.20
+  stratify: true
+  random_state: 42
+
+cross_validation:
+  folds: 10
+  stratified: true
+  shuffle: true
+  random_state: 42
+
+primary_metric: "macro_f1"
+
+models:
+  baseline: "DummyClassifier"
+  reference: "RandomForestClassifier"
+  random_forest_default:
+    n_estimators: 100
+    class_weight: "balanced"
+    random_state: 42
+    n_jobs: -1
+  candidate_matrix:
+    - "DummyClassifier"
+    - "LogisticRegression"
+    - "DecisionTreeClassifier"
+    - "GaussianNB"
+    - "RandomForestClassifier"
+    - "ExtraTreesClassifier"
+    - "GradientBoostingClassifier"
+    - "HistGradientBoostingClassifier"
+    - "SVC_RBF"
+    - "KNeighborsClassifier"
+    - "XGBClassifier"
+    - "LGBMClassifier"
+    - "CatBoostClassifier"
+    - "VotingClassifier"
+    - "StackingClassifier"
+    - "MLPClassifier"
+
+optimization:
+  framework: "Optuna"
+  sampler: "TPESampler"
+  pruner: "MedianPruner"
+  n_trials: 50
+  cv_folds: 5
+  seed: 42
+
+artifacts:
+  output_dir: "models"
+  model_path: "models/model.joblib"
+  metadata_path: "models/model.meta.json"
+  feature_importance_path: "models/feature_importance.json"
+  shap_summary_path: "models/shap_summary.json"
+
+tracking:
+  mlflow_tracking_uri: "sqlite:///mlflow.db"
+  experiment_name: "SEB-XRIF-Learner-Performance"
+
+benchmarks:
+  published_f1_range_min: 0.75
+  published_f1_range_max: 0.83
+  sus_benchmark: 76.6
+  cohens_d_benchmark: 0.936
+
+evaluation:
+  sus:
+    questions_count: 10
+    multiplier: 2.5
+  effect_size:
+    method: "cohens_d"
+    thresholds:
+      small: 0.2
+      medium: 0.5
+      large: 0.8
+  longitudinal:
+    timepoints:
+      T0: "Baseline prior to XR intervention"
+      T1: "Immediate post-intervention"
+      T2: "One semester delayed retention without re-teaching"

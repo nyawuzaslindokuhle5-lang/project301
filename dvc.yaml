@@ -1,0 +1,52 @@
+stages:
+  validate_data:
+    cmd: python3 -m analytics.schema --data data/raw/xAPI-Edu-Data.csv
+    deps:
+      - data/raw/xAPI-Edu-Data.csv
+      - analytics/schema.py
+      - analytics/config.yaml
+    outs:
+      - data/processed/.validation_passed
+
+  preprocess:
+    cmd: python3 -m analytics.preprocess --config analytics/config.yaml
+    deps:
+      - data/raw/xAPI-Edu-Data.csv
+      - analytics/preprocess.py
+      - data/processed/.validation_passed
+    outs:
+      - data/processed/train.parquet
+      - data/processed/test.parquet
+
+  train:
+    cmd: python3 -m analytics.train --config analytics/config.yaml
+    deps:
+      - data/processed/train.parquet
+      - analytics/train.py
+      - analytics/config.yaml
+    outs:
+      - models/model.joblib
+      - models/model.meta.json
+
+  evaluate:
+    cmd: python3 -m analytics.evaluate --config analytics/config.yaml
+    deps:
+      - models/model.joblib
+      - data/processed/test.parquet
+      - analytics/evaluate.py
+    outs:
+      - models/metrics.json
+      - models/comparison_matrix.json
+    metrics:
+      - models/metrics.json:
+          cache: false
+
+  explain:
+    cmd: python3 -m analytics.explain --config analytics/config.yaml
+    deps:
+      - models/model.joblib
+      - data/processed/test.parquet
+      - analytics/explain.py
+    outs:
+      - models/feature_importance.json
+      - models/shap_summary.json

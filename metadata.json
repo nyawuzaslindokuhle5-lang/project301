@@ -1,0 +1,8 @@
+{
+  "name": "Remix SEB-XRIF Platform",
+  "description": "Scalable, Evidence-Based XR Integration Framework for educational analytics, ML prediction, SHAP explainability, and longitudinal evaluation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

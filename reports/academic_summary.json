@@ -1,0 +1,20 @@
+{
+  "title": "SEB-XRIF Academic Validation Summary",
+  "timestamp": "2026-09-29 19:06:38 UTC",
+  "champion_model": {
+    "name": "VotingClassifier (Soft)",
+    "test_macro_f1": 0.8214,
+    "test_accuracy": 0.8265
+  },
+  "psychometrics": {
+    "sus_score": 77.5,
+    "sus_grade": "B+",
+    "cohens_d": 0.939,
+    "cles_pct": 74.7
+  },
+  "longitudinal": {
+    "gain": 18.4,
+    "retention_pct": 76.1
+  },
+  "status": "12/12 Phases 100% Complete"
+}
